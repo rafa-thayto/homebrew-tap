@@ -1,0 +1,106 @@
+name: Publish Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version tag to mirror (e.g. v0.3.0)"
+        required: true
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download binaries from private resend/resend-cli
+        env:
+          GH_TOKEN: ${{ secrets.RESEND_CLI_PAT }}
+          VERSION: ${{ inputs.version }}
+        run: |
+          gh release download "${VERSION}" \
+            --repo resend/resend-cli \
+            --pattern "resend-darwin-arm64.tar.gz" \
+            --pattern "resend-darwin-x64.tar.gz" \
+            --pattern "resend-linux-arm64.tar.gz" \
+            --pattern "resend-linux-x64.tar.gz" \
+            --dir ./artifacts
+
+      - name: Create public release on this tap repo
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ inputs.version }}
+        run: |
+          gh release create "${VERSION}" artifacts/*.tar.gz \
+            --repo rafa-thayto/homebrew-tap \
+            --title "resend ${VERSION}" \
+            --notes "Resend CLI ${VERSION}"
+
+      - name: Compute SHA256 and update formula
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          VER="${VERSION#v}"
+
+          cd artifacts
+          SHA_DARWIN_ARM64=$(sha256sum resend-darwin-arm64.tar.gz | awk '{print $1}')
+          SHA_DARWIN_X64=$(sha256sum resend-darwin-x64.tar.gz     | awk '{print $1}')
+          SHA_LINUX_ARM64=$(sha256sum resend-linux-arm64.tar.gz   | awk '{print $1}')
+          SHA_LINUX_X64=$(sha256sum resend-linux-x64.tar.gz       | awk '{print $1}')
+          cd ..
+
+          cat > Formula/resend.rb << FORMULA_EOF
+# typed: false
+# frozen_string_literal: true
+
+class Resend < Formula
+  desc     "Resend CLI - send emails from your terminal"
+  homepage "https://resend.com"
+  version  "${VER}"
+
+  on_macos do
+    on_arm do
+      url "https://github.com/rafa-thayto/homebrew-tap/releases/download/v${VER}/resend-darwin-arm64.tar.gz"
+      sha256 "${SHA_DARWIN_ARM64}"
+    end
+
+    on_intel do
+      url "https://github.com/rafa-thayto/homebrew-tap/releases/download/v${VER}/resend-darwin-x64.tar.gz"
+      sha256 "${SHA_DARWIN_X64}"
+    end
+  end
+
+  on_linux do
+    on_arm do
+      url "https://github.com/rafa-thayto/homebrew-tap/releases/download/v${VER}/resend-linux-arm64.tar.gz"
+      sha256 "${SHA_LINUX_ARM64}"
+    end
+
+    on_intel do
+      url "https://github.com/rafa-thayto/homebrew-tap/releases/download/v${VER}/resend-linux-x64.tar.gz"
+      sha256 "${SHA_LINUX_X64}"
+    end
+  end
+
+  def install
+    bin.install "resend"
+  end
+
+  test do
+    assert_match version.to_s, shell_output("#{bin}/resend --version 2>&1")
+  end
+end
+FORMULA_EOF
+
+      - name: Commit updated formula
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add Formula/resend.rb
+          git commit -m "chore: update resend formula to ${VERSION}"
+          git push origin main
