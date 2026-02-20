@@ -4,29 +4,29 @@
 class Resend < Formula
   desc     "Resend CLI - send emails from your terminal"
   homepage "https://resend.com"
-  version  "0.3.0"
+  version  "0.4.0"
 
   on_macos do
     on_arm do
       url "https://github.com/rafa-thayto/homebrew-tap/releases/download/v#{version}/resend-darwin-arm64.tar.gz"
-      sha256 "834e0bf3e4948af5f0a4cecc01f47934868370db47660af0531b63622fb92758"
+      sha256 "b6b82a0ced9cfc21a691352c6aa33e8f7b75add5e6d111087f108671cbe4e349"
     end
 
     on_intel do
       url "https://github.com/rafa-thayto/homebrew-tap/releases/download/v#{version}/resend-darwin-x64.tar.gz"
-      sha256 "eeb9233aa84598c5e23cb6fe26ed4fe23858503c4c57d2c0a4cce0691ccde3b1"
+      sha256 "6e6ad146174332b06997f1a590aa56ed4c1781c612f7040cfa816e4eb16162e4"
     end
   end
 
   on_linux do
     on_arm do
       url "https://github.com/rafa-thayto/homebrew-tap/releases/download/v#{version}/resend-linux-arm64.tar.gz"
-      sha256 "de93f0d7d2a1a35c3d8d7093c42d53bf525253dc36f6b408955d6b1d86354d77"
+      sha256 "2988e9a746871fddfe34111383a0a2f35682adfa095d4afe3601e938324231ca"
     end
 
     on_intel do
       url "https://github.com/rafa-thayto/homebrew-tap/releases/download/v#{version}/resend-linux-x64.tar.gz"
-      sha256 "16c3add31f2c8eec9d43dd1383e6936418ea5c44c6f1c90b34dc00e1bf2789f2"
+      sha256 "7f886e960ca2e8727ce7868b36a7752fb174043bce95e36232ac378b5f7c3244"
     end
   end
 
