@@ -44,56 +44,18 @@ jobs:
           VERSION: ${{ inputs.version }}
         run: |
           VER="${VERSION#v}"
+          SHA_DARWIN_ARM64=$(sha256sum artifacts/resend-darwin-arm64.tar.gz | awk '{print $1}')
+          SHA_DARWIN_X64=$(sha256sum artifacts/resend-darwin-x64.tar.gz     | awk '{print $1}')
+          SHA_LINUX_ARM64=$(sha256sum artifacts/resend-linux-arm64.tar.gz   | awk '{print $1}')
+          SHA_LINUX_X64=$(sha256sum artifacts/resend-linux-x64.tar.gz       | awk '{print $1}')
 
-          cd artifacts
-          SHA_DARWIN_ARM64=$(sha256sum resend-darwin-arm64.tar.gz | awk '{print $1}')
-          SHA_DARWIN_X64=$(sha256sum resend-darwin-x64.tar.gz     | awk '{print $1}')
-          SHA_LINUX_ARM64=$(sha256sum resend-linux-arm64.tar.gz   | awk '{print $1}')
-          SHA_LINUX_X64=$(sha256sum resend-linux-x64.tar.gz       | awk '{print $1}')
-          cd ..
-
-          cat > Formula/resend.rb << FORMULA_EOF
-# typed: false
-# frozen_string_literal: true
-
-class Resend < Formula
-  desc     "Resend CLI - send emails from your terminal"
-  homepage "https://resend.com"
-  version  "${VER}"
-
-  on_macos do
-    on_arm do
-      url "https://github.com/rafa-thayto/homebrew-tap/releases/download/v${VER}/resend-darwin-arm64.tar.gz"
-      sha256 "${SHA_DARWIN_ARM64}"
-    end
-
-    on_intel do
-      url "https://github.com/rafa-thayto/homebrew-tap/releases/download/v${VER}/resend-darwin-x64.tar.gz"
-      sha256 "${SHA_DARWIN_X64}"
-    end
-  end
-
-  on_linux do
-    on_arm do
-      url "https://github.com/rafa-thayto/homebrew-tap/releases/download/v${VER}/resend-linux-arm64.tar.gz"
-      sha256 "${SHA_LINUX_ARM64}"
-    end
-
-    on_intel do
-      url "https://github.com/rafa-thayto/homebrew-tap/releases/download/v${VER}/resend-linux-x64.tar.gz"
-      sha256 "${SHA_LINUX_X64}"
-    end
-  end
-
-  def install
-    bin.install "resend"
-  end
-
-  test do
-    assert_match version.to_s, shell_output("#{bin}/resend --version 2>&1")
-  end
-end
-FORMULA_EOF
+          sed \
+            -e "s/{{VER}}/${VER}/g" \
+            -e "s/{{SHA_DARWIN_ARM64}}/${SHA_DARWIN_ARM64}/" \
+            -e "s/{{SHA_DARWIN_X64}}/${SHA_DARWIN_X64}/" \
+            -e "s/{{SHA_LINUX_ARM64}}/${SHA_LINUX_ARM64}/" \
+            -e "s/{{SHA_LINUX_X64}}/${SHA_LINUX_X64}/" \
+            Formula/resend.rb.tpl > Formula/resend.rb
 
       - name: Commit updated formula
         env:
