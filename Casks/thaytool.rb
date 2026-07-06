@@ -1,6 +1,6 @@
 cask "thaytool" do
-  version "0.52.0"
-  sha256 "0e7cadad9be6030d5a631952ddf3d98226a6b4fce5fc29f6a942173a6ff6a81c"
+  version "0.53.0"
+  sha256 "4675692543c2bc321e7ced164f9e963a053f514eef37e95b347a28fa320e1a47"
 
   url "https://assets.thaytool.com/releases/stable/v#{version}/Thaytool.dmg",
       verified: "assets.thaytool.com/"
