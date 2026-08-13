@@ -9,17 +9,16 @@ on:
 jobs:
   test-bot:
     strategy:
-      # One runner's failure must not cancel the others: the macOS legs are what validate the
-      # thaytool cask, and a fail-fast cancel meant a Linux-only problem hid their result
-      # entirely (every run was red with the macOS legs reported as "canceled").
+      # One runner's failure must not cancel the others — a fail-fast cancel used to hide the
+      # surviving legs' results entirely (runs went red with the others "canceled").
       fail-fast: false
       matrix:
-        # ubuntu-24.04, NOT 22.04: `brew test-bot --only-setup` runs `brew doctor`, which now
-        # FAILS on 22.04 with "Your system glibc 2.35 is too old" (a Homebrew Tier 2 config).
-        # 24.04 ships glibc 2.39, so doctor passes. Linux is kept because Formula/resend.rb has
-        # real on_linux builds; the thaytool cask itself is macOS-only and is exercised by the
-        # macOS legs.
-        os: [ ubuntu-24.04, macos-15-intel, macos-26 ]
+        # macOS ONLY. This tap ships exactly one thing: the thaytool cask, which is macOS-only
+        # (depends_on macos:, installs a .app) and cannot be exercised on Linux at all. The
+        # ubuntu leg was also actively harmful: `brew test-bot --only-setup` runs `brew doctor`,
+        # which hard-fails on ubuntu-22.04 with "Your system glibc 2.35 is too old" (Homebrew
+        # Tier 2), so every run was red for a reason unrelated to the tap's contents.
+        os: [ macos-15-intel, macos-26 ]
     runs-on: ${{ matrix.os }}
     permissions:
       actions: read
