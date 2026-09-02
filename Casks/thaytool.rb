@@ -2,8 +2,7 @@ cask "thaytool" do
   version "0.82.0"
   sha256 "8e7d31d5f2763dbe33b27f3755c5c3ee8798bad760b35ddebf85776cb510bf00"
 
-  url "https://assets.thaytool.com/releases/stable/v#{version}/Thaytool.dmg",
-      verified: "assets.thaytool.com/"
+  url "https://assets.thaytool.com/releases/stable/v#{version}/Thaytool.dmg"
   name "Thaytool"
   desc "Terminal-first local git worktree manager for coding agents"
   homepage "https://thaytool.com/"
