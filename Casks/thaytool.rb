@@ -4,7 +4,7 @@ cask "thaytool" do
 
   url "https://assets.thaytool.com/releases/stable/v#{version}/Thaytool.dmg"
   name "Thaytool"
-  desc "Terminal-first local git worktree manager for coding agents"
+  desc "Git worktree workspaces with persistent terminals for Claude Code and Codex"
   homepage "https://thaytool.com/"
 
   livecheck do
