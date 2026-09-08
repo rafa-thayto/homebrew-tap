@@ -18,7 +18,11 @@ jobs:
         # ubuntu leg was also actively harmful: `brew test-bot --only-setup` runs `brew doctor`,
         # which hard-fails on ubuntu-22.04 with "Your system glibc 2.35 is too old" (Homebrew
         # Tier 2), so every run was red for a reason unrelated to the tap's contents.
-        os: [ macos-15-intel, macos-26 ]
+        # macOS 26 ONLY, Apple silicon. The cask needs macOS >= 26 (depends_on macos: :tahoe)
+        # and the app is arm64-only, so a macos-15-intel leg can never install it. That leg
+        # was also red on every push: `brew style` installs shellcheck, Intel has no bottle
+        # left for its gmp dependency, and the runner's source download of gmp times out.
+        os: [ macos-26 ]
     runs-on: ${{ matrix.os }}
     permissions:
       actions: read
