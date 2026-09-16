@@ -1,6 +1,6 @@
 cask "thaytool" do
-  version "0.92.0"
-  sha256 "c91f745cc6c92a4978194cfafc6bdd7d30812a97c3a675af4ea68a1037958c50"
+  version "0.93.0"
+  sha256 "d75cc8cbff3996a590cabd30e129c7467facd4296bf9f36cf5670fe6a941ae1e"
 
   url "https://assets.thaytool.com/releases/stable/v#{version}/Thaytool.dmg"
   name "Thaytool"
@@ -18,6 +18,10 @@ cask "thaytool" do
   depends_on macos: :tahoe
 
   app "Thaytool.app"
+  # The bundled Control CLI (Contents/Helpers/thaytool, #110): brew links it into its bin
+  # so `thaytool` is on PATH after `brew install thaytool`. The link points INTO the .app,
+  # so Sparkle's in-place updates keep it valid — same target as the in-app Install command.
+  binary "#{appdir}/Thaytool.app/Contents/Helpers/thaytool"
 
   uninstall quit: "com.thaytool.app"
 
