@@ -10,7 +10,7 @@ cask "thaytool" do
   livecheck do
     url "https://assets.thaytool.com/appcast.xml"
     strategy :sparkle do |items|
-      items.find { |item| item.channel.blank? }&.bundle_version&.nice_version
+      items.find { |item| item.channel.blank? }&.short_version
     end
   end
 
